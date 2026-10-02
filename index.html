@@ -13,8 +13,9 @@
 <script>
 async function start() {
   const bases = [
-    "https://cdn.jsdelivr.net/gh/Kevin82se/el-capo-bordbokning@main/",
-    "https://cdn.statically.io/gh/Kevin82se/el-capo-bordbokning/main/"
+    "https://raw.githubusercontent.com/Kevin82se/el-capo-bordbokning/ffb489bf34e9281816d563143fb637bcb1c9eca6/",
+    "https://cdn.jsdelivr.net/gh/Kevin82se/el-capo-bordbokning@ffb489bf34e9281816d563143fb637bcb1c9eca6/",
+    "https://cdn.statically.io/gh/Kevin82se/el-capo-bordbokning/ffb489bf34e9281816d563143fb637bcb1c9eca6/"
   ];
   let last = "";
   for (const base of bases) {
@@ -28,13 +29,14 @@ async function start() {
       const bin = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
       const ds = new DecompressionStream("gzip");
       const html = await new Response(new Blob([bin]).stream().pipeThrough(ds)).text();
+      if (!html.includes("Bordbokning")) throw new Error("fel innehall");
       document.open();
       document.write(html);
       document.close();
       return;
     } catch (e) { last = e; }
   }
-  document.getElementById("msg").textContent = "Kunde inte öppna än. Vänta en minut och ladda om. " + last;
+  document.getElementById("msg").textContent = "Kunde inte öppna än. Ladda om sidan. " + last;
 }
 start();
 </script>
