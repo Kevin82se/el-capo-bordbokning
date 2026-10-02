@@ -1,11 +1,42 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="refresh" content="0; url=https://cdn.jsdelivr.net/gh/Kevin82se/el-capo-bordbokning@main/el-capo-bordbokning.html">
-  <title>El Capo Bordbokning</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="theme-color" content="#161310" />
+<title>El Capo — Bordbokning</title>
 </head>
-<body>
-  <p>Oppnar appen... <a href="el-capo-bordbokning.html">Oppna har</a></p>
+<body style="margin:0;background:#161310;color:#f3ead8;font-family:Georgia,serif">
+<p id="msg" style="padding:28px 20px;font-size:18px">Öppnar El Capo…</p>
+<script>
+async function start() {
+  const bases = [
+    "https://cdn.jsdelivr.net/gh/Kevin82se/el-capo-bordbokning@main/",
+    "https://cdn.statically.io/gh/Kevin82se/el-capo-bordbokning/main/"
+  ];
+  let last = "";
+  for (const base of bases) {
+    try {
+      const parts = await Promise.all([1,2,3].map(async i => {
+        const r = await fetch(base + "p" + i + ".txt");
+        if (!r.ok) throw new Error("del " + i);
+        return r.text();
+      }));
+      const b64 = parts.join("").replace(/\s+/g, "");
+      const bin = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+      const ds = new DecompressionStream("gzip");
+      const html = await new Response(new Blob([bin]).stream().pipeThrough(ds)).text();
+      document.open();
+      document.write(html);
+      document.close();
+      return;
+    } catch (e) { last = e; }
+  }
+  document.getElementById("msg").textContent = "Kunde inte öppna än. Vänta en minut och ladda om. " + last;
+}
+start();
+</script>
 </body>
 </html>
